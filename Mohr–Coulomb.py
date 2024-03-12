@@ -129,6 +129,8 @@ if __name__ == '__main__':
     print('sigma =', sigma_3, 'tau =', tau_3)
 
     plt.style.use('seaborn-v0_8')
+    plt.ylabel('τ, МПа')
+    plt.xlabel('σ, МПа')
     circle = plt.Circle((Rc, sigma_3_c), Rc, color='#459966', fill=False, linewidth=2)
     plt.gca().add_patch(circle)
     circle = plt.Circle((-Rp, sigma_3_p), Rp, color='#995989', fill=False, linewidth=2)
