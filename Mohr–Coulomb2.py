@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from scipy import interpolate
 from scipy.interpolate import splev, splrep
 
-#Пример заданных значений
-sigma_3 = -20.3333  # С точностью до 4-х знаков
+# Пример заданных значений
+sigma_3 = -10.3333   # С точностью до 4-х знаков
 Rc = 60
 Rp = 10
 sigma_3_c = 0
@@ -24,10 +24,22 @@ sigma_3_p = 0
 # xp, yp = np.asarray(circlepoints(100000, Rp, [-Rp, sigma_3_p]))
 # plt.plot(xc, yc)
 # plt.plot(xp, yp)
-def data_processing(Rc, Rp, sigma_3):
 
+
+def data_processing(Rc, Rp, sigma_3):
+    '''
+    Фунция для нахождения тау огибающей по сигме
+    :param Rc: Радиус круга сжатия
+    :param Rp: Радиус круга растяжения
+    :param sigma_3: Сигма для нахождения тау огибающей
+    :return: sigma_array_new, tau_array_new, tau_3
+    '''
 
     def methodical_data():
+        '''
+        функция для создания  q1_q2_dict, q2_K1_q1_dict из интерполированных данных ГОСТ 21153.8-88
+        :return: q1_q2_dict, q2_K1_q1_dict
+        '''
         q1_q2_array = np.array([
         1.3, 1.5, 2.0, 2.5, 3.0,  3.5, 4.0, 4.4, 4.8, 5.2, 5.6, 6.0, 6.4,
         6.8,  7.0, 7.2, 7.4, 7.6, 7.8, 8.0, 8.2, 8.4, 8.6, 8.8, 9.0, 9.2,
@@ -101,17 +113,20 @@ def data_processing(Rc, Rp, sigma_3):
 
     # Интерполирование и создание словаря. По значению sigma_3 с точностью до 4 знака находятся значения tau
     spl = splrep(sigma_array, tau_array)
-    sigma_array1 = np.around(np.arange(min(sigma_array), (max(sigma_array)-0.01), 0.0001), 4)
-    tau_array1 = splev(sigma_array1, spl)
-    sigma_array_tau_dict = dict(zip(sigma_array1, tau_array1))
+    sigma_array_new = np.around(np.arange(min(sigma_array), (max(sigma_array)-0.01), 0.0001), 4)
+    tau_array_new = splev(sigma_array_new, spl)
+    sigma_array_tau_dict = dict(zip(sigma_array_new, tau_array_new))
 
-    # Вывод значения tau
-    print('tau по sigma =', sigma_3, 'равно', np.round(sigma_array_tau_dict[sigma_3], 4))
-
-    return sigma_array1, tau_array1, sigma_array, tau_array
+    # Нахождение значения tau
+    try:
+        tau_3 = np.round(sigma_array_tau_dict[sigma_3], 4)
+    except:
+        tau_3 = 'None'
+    return sigma_array_new, tau_array_new, tau_3
 
 if __name__ == '__main__':
-    sigma_array1, tau_array1, sigma_array, tau_array = data_processing(Rc, Rp, sigma_3)
+    sigma_array, tau_array, tau_3 = data_processing(Rc, Rp, sigma_3)
+    print('sigma =', sigma_3, 'tau =', tau_3)
 
     plt.style.use('seaborn-v0_8')
     circle = plt.Circle((Rc, sigma_3_c), Rc, color='#459966', fill=False, linewidth=2)
@@ -120,6 +135,5 @@ if __name__ == '__main__':
     plt.gca().add_patch(circle)
     plt.xlim(-Rc, Rc * 3)
     plt.ylim(-Rc * 2, Rc * 2)
-
-    plt.plot(sigma_array1, tau_array1)
+    plt.plot(sigma_array, tau_array)
     plt.show()
