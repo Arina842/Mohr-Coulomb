@@ -5,7 +5,7 @@ from scipy.interpolate import splev, splrep
 
 # Пример заданных значений
 sigma_3 = -10.3333   # С точностью до 4-х знаков
-Rc = 60
+Rc = 40
 Rp = 10
 sigma_3_c = 0
 sigma_3_p = 0
@@ -128,14 +128,14 @@ if __name__ == '__main__':
     sigma_array, tau_array, tau_3 = data_processing(Rc, Rp, sigma_3)
     print('sigma =', sigma_3, 'tau =', tau_3)
 
-    plt.style.use('seaborn-v0_8')
+    plt.style.use('bmh')
     plt.ylabel('τ, МПа')
     plt.xlabel('σ, МПа')
-    circle = plt.Circle((Rc, sigma_3_c), Rc, color='#459966', fill=False, linewidth=2)
+    circle = plt.Circle((Rc, sigma_3_c), Rc, color='#4189C5', fill=False, linewidth=2)
     plt.gca().add_patch(circle)
-    circle = plt.Circle((-Rp, sigma_3_p), Rp, color='#995989', fill=False, linewidth=2)
+    circle = plt.Circle((-Rp, sigma_3_p), Rp, color='#A01234', fill=False, linewidth=2)
     plt.gca().add_patch(circle)
     plt.xlim(-Rc, Rc * 3)
     plt.ylim(-Rc * 2, Rc * 2)
-    plt.plot(sigma_array, tau_array)
+    plt.plot(sigma_array, tau_array, color='#8955AC')
     plt.show()
