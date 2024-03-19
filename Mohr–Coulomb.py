@@ -77,19 +77,12 @@ def data_processing(Rc, Rp, sigma_3):
         a = sigma_c / (2 * q2)
         sigma0 = a*k1_q1
 
-        # Значения для цикла. Подбор i как точка пересечения оси tau с нулём найдена по формулам ГОСТ 21153.8-88
-        # K=(sigma +sigma0)/a --> K=0 --> i=sigma=-sigma0
-        k = []
-        i = -sigma0
-
-        # Нахождение k с шагом 0.01. Верхний предел 4 Rc взят как пример
-        while i < Rc*4:
-            k.append((i+sigma0)/a)
-            i += 0.01
-            
-        # Нахождение sigma и tau огибающей
-        k_array = np.asarray(k)
+        # Нахождение k_array с шагом 0.01. Верхний предел 4 Rc взят как пример
+        # K=(sigma +sigma0)/a --> K=0 --> нижний предел len_k= sigma =-sigma0
+        len_k = np.arange(-sigma0, Rc*4, 0.01)
+        k_array = (len_k+sigma0)/a
         l = 0.73*((k_array**2)/(k_array**2+1))**(3/8)
+        
         tau_array = l * a
         sigma_array = (k_array * a) - sigma0
         
