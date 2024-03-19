@@ -2,28 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import interpolate
 from scipy.interpolate import splev, splrep
+import time
 
 # Пример заданных значений
-sigma_3 = -10.3333   # С точностью до 4-х знаков
-Rc = 40
+sigma_3 =70.4  # С точностью до 4-х знаков
+Rc = 140
 Rp = 10
 sigma_3_c = 0
 sigma_3_p = 0
-
-# #Вариант отрисовки  кругов по точкам
-# def circlepoints(points, radius, center):
-#     x = []
-#     y = []
-#     slice = 2 * np.pi / (points-1)
-#     for i in range(points):
-#         angle = slice * i
-#         x.append(center[0] + radius*np.cos(angle))
-#         y.append(center[1] + radius*np.sin(angle))
-#     return x, y
-# xc, yc = np.asarray(circlepoints(100000, Rc, [Rc, sigma_3_c]))
-# xp, yp = np.asarray(circlepoints(100000, Rp, [-Rp, sigma_3_p]))
-# plt.plot(xc, yc)
-# plt.plot(xp, yp)
 
 
 def data_processing(Rc, Rp, sigma_3):
@@ -37,8 +23,8 @@ def data_processing(Rc, Rp, sigma_3):
 
     def methodical_data():
         '''
-        функция для создания  q1_q2_dict, q2_K1_q1_dict из интерполированных данных ГОСТ 21153.8-88
-        :return: q1_q2_dict, q2_K1_q1_dict
+        функция для создания массивов q1_q2_array,q2_array, K1_q1_array из ГОСТ 21153.8-88
+        :return: q1_q2_array,q2_array, K1_q1_array
         '''
         q1_q2_array = np.array([
         1.3, 1.5, 2.0, 2.5, 3.0,  3.5, 4.0, 4.4, 4.8, 5.2, 5.6, 6.0, 6.4,
@@ -69,30 +55,18 @@ def data_processing(Rc, Rp, sigma_3):
         0.0109, 0.0095, 0.0083, 0.0073, 0.0065, 0.0058, 0.0052, 0.0047,
         0.0043, 0.0039, 0.0036, 0.0024
         ])
+        return q1_q2_array,q2_array, K1_q1_array
 
-        #Интерполирование данных таблицы q2_array от q1_q2_array и K1_q1_array от интерполированной q2_array
-        temp = interpolate.interp1d(q1_q2_array, q2_array)
-        temp2 = interpolate.interp1d(q2_array, K1_q1_array)
-
-        q1_q2_array = np.around(np.arange(min(q1_q2_array), max(q1_q2_array), 0.01), 2)
-        q2_array = np.around(temp(q1_q2_array), 4)
-        K1_q1_array = np.around(temp2(q2_array), 4)
-
-        # Создание словаря q1_q2_array / q2_array о и q2_array / K1_q1_array
-        q1_q2_dict = dict(zip(q1_q2_array, q2_array))
-        q2_K1_q1_dict = dict(zip(q2_array, K1_q1_array))
-        return q1_q2_dict, q2_K1_q1_dict
-
-    q1_q2_dict, q2_K1_q1_dict = methodical_data()
-
+    q1_q2_array, q2_array, K1_q1_array = methodical_data()
+    
     # Расчёт для заданных радиусов кругов
     sigma_c = Rc*2
     sigma_p = Rp*2
-    q1_q2 = round(sigma_c/sigma_p, 2)
-    q2 = q1_q2_dict[q1_q2]
-    k1_q1 = q2_K1_q1_dict[q2]
+    q1_q2 = sigma_c/sigma_p
+    q2 = np.interp(q1_q2, q1_q2_array, q2_array)
+    k1_q1 = np.interp(q1_q2, q1_q2_array, K1_q1_array)
     a = sigma_c / (2 * q2)
-    sigma0 = round(a*k1_q1, 4)
+    sigma0 = a*k1_q1
 
     # Значения для цикла. Подбор i как точка пересечения оси tau с нулём найдена по формулам ГОСТ 21153.8-88
     # K=(sigma +sigma0)/a --> K=0 --> i=sigma=-sigma0
@@ -105,24 +79,12 @@ def data_processing(Rc, Rp, sigma_3):
         l = 0.73*((k**2)/(k**2+1))**(3/8)
         sigma_array.append(k*a-sigma0)
         tau_array.append(l * a)
-        i += 0.01
+        i += 0.001
 
-    # Сортировка значений для дальнейшейшего нахождения sigma_3
-    sigma_array.sort()
-    tau_array.sort()
+    tau_3 = np.round(np.interp(sigma_3, sigma_array, tau_array), 4)
 
-    # Интерполирование и создание словаря. По значению sigma_3 с точностью до 4 знака находятся значения tau
-    spl = splrep(sigma_array, tau_array)
-    sigma_array_new = np.around(np.arange(min(sigma_array), (max(sigma_array)-0.01), 0.0001), 4)
-    tau_array_new = splev(sigma_array_new, spl)
-    sigma_array_tau_dict = dict(zip(sigma_array_new, tau_array_new))
+    return sigma_array, tau_array, tau_3
 
-    # Нахождение значения tau
-    try:
-        tau_3 = np.round(sigma_array_tau_dict[sigma_3], 4)
-    except:
-        tau_3 = 'None'
-    return sigma_array_new, tau_array_new, tau_3
 
 if __name__ == '__main__':
     sigma_array, tau_array, tau_3 = data_processing(Rc, Rp, sigma_3)
