@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Пример заданных значений
-sigma_3 = 150 # С точностью до 4-х знаков
+sigma_3 = 150 
 Rc = 140
 Rp = 40
 sigma_3_c = 0
