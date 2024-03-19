@@ -1,19 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 
-
-def timer(func):
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        execution_time = end_time - start_time
-        print(f"Execution time: {execution_time} seconds")
-
-        return result
-
-    return wrapper
 # Пример заданных значений
 sigma_3 = 150 # С точностью до 4-х знаков
 Rc = 140
@@ -21,7 +8,7 @@ Rp = 40
 sigma_3_c = 0
 sigma_3_p = 0
 
-@timer
+
 def data_processing(Rc, Rp, sigma_3):
     '''
     Фунция для нахождения координат огибающей, тау по заданной сигме
@@ -31,7 +18,7 @@ def data_processing(Rc, Rp, sigma_3):
     :return: q1_q2_array, q2_array, k1_q1_array
     '''
 
-    @timer
+
     def methodical_data():
         '''
         функция для создания массивов q1_q2_array,q2_array, k1_q1_array из ГОСТ 21153.8-88
@@ -71,7 +58,7 @@ def data_processing(Rc, Rp, sigma_3):
 
     q1_q2_array, q2_array, k1_q1_array = methodical_data()
 
-    @timer
+
     def calculation_of_parameters(q1_q2_array, q2_array, k1_q1_array):
         # Расчёт для заданных радиусов кругов
         sigma_c = Rc*2
