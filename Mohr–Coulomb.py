@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import interpolate
 from scipy.interpolate import splev, splrep
-import time
 
 # Пример заданных значений
 sigma_3 =70.4  # С точностью до 4-х знаков
