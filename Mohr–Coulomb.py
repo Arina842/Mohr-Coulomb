@@ -60,7 +60,15 @@ def data_processing(Rc, Rp, sigma_3):
 
 
     def calculation_of_parameters(q1_q2_array, q2_array, k1_q1_array):
-        # Расчёт для заданных радиусов кругов
+        '''
+        Фунция для нахождения координат огибающей
+        :param q1_q2_array: массив по ГОСТ 21153.8-88
+        :param q2_array: массив по ГОСТ 21153.8-88
+        :param k1_q1_array: массив по ГОСТ 21153.8-88
+        :return: sigma_array, tau_array
+        '''
+        
+        # Расчёт параметров для заданных радиусов кругов
         sigma_c = Rc*2
         sigma_p = Rp*2
         q1_q2 = sigma_c/sigma_p
@@ -78,11 +86,13 @@ def data_processing(Rc, Rp, sigma_3):
         while i < Rc*4:
             k.append((i+sigma0)/a)
             i += 0.01
-
+            
+        # Нахождение sigma и tau огибающей
         k_array = np.asarray(k)
         l = 0.73*((k_array**2)/(k_array**2+1))**(3/8)
         tau_array = l * a
         sigma_array = (k_array * a) - sigma0
+        
         return sigma_array, tau_array
 
     sigma_array, tau_array = calculation_of_parameters(q1_q2_array, q2_array, k1_q1_array)
