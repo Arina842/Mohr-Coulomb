@@ -1,29 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import interpolate
-from scipy.interpolate import splev, splrep
 
 # Пример заданных значений
-sigma_3 =70.4  # С точностью до 4-х знаков
+sigma_3 = 150 # С точностью до 4-х знаков
 Rc = 140
-Rp = 10
+Rp = 40
 sigma_3_c = 0
 sigma_3_p = 0
 
 
 def data_processing(Rc, Rp, sigma_3):
     '''
-    Фунция для нахождения тау огибающей по сигме
+    Фунция для нахождения координат огибающей, тау по заданной сигме
     :param Rc: Радиус круга сжатия
     :param Rp: Радиус круга растяжения
     :param sigma_3: Сигма для нахождения тау огибающей
-    :return: sigma_array_new, tau_array_new, tau_3
+    :return: q1_q2_array, q2_array, k1_q1_array
     '''
+
 
     def methodical_data():
         '''
-        функция для создания массивов q1_q2_array,q2_array, K1_q1_array из ГОСТ 21153.8-88
-        :return: q1_q2_array,q2_array, K1_q1_array
+        функция для создания массивов q1_q2_array,q2_array, k1_q1_array из ГОСТ 21153.8-88
+        :return: q1_q2_array,q2_array, k1_q1_array
         '''
         q1_q2_array = np.array([
         1.3, 1.5, 2.0, 2.5, 3.0,  3.5, 4.0, 4.4, 4.8, 5.2, 5.6, 6.0, 6.4,
@@ -44,7 +43,7 @@ def data_processing(Rc, Rp, sigma_3):
         0.0491, 0.0467, 0.0446, 0.0363
         ])
 
-        K1_q1_array = np.array([
+        k1_q1_array = np.array([
         1.1418, 1.1118, 0.7317, 0.5252, 0.3933, 0.3011, 0.2335, 0.1918,
         0.1586, 0.1322, 0.1111, 0.0942, 0.0807, 0.0697, 0.0649, 0.0607,
         0.0568, 0.0533, 0.0500, 0.0471, 0.0443, 0.0419, 0.0396, 0.0375,
@@ -54,32 +53,41 @@ def data_processing(Rc, Rp, sigma_3):
         0.0109, 0.0095, 0.0083, 0.0073, 0.0065, 0.0058, 0.0052, 0.0047,
         0.0043, 0.0039, 0.0036, 0.0024
         ])
-        return q1_q2_array,q2_array, K1_q1_array
 
-    q1_q2_array, q2_array, K1_q1_array = methodical_data()
-    
-    # Расчёт для заданных радиусов кругов
-    sigma_c = Rc*2
-    sigma_p = Rp*2
-    q1_q2 = sigma_c/sigma_p
-    q2 = np.interp(q1_q2, q1_q2_array, q2_array)
-    k1_q1 = np.interp(q1_q2, q1_q2_array, K1_q1_array)
-    a = sigma_c / (2 * q2)
-    sigma0 = a*k1_q1
+        return q1_q2_array, q2_array, k1_q1_array
 
-    # Значения для цикла. Подбор i как точка пересечения оси tau с нулём найдена по формулам ГОСТ 21153.8-88
-    # K=(sigma +sigma0)/a --> K=0 --> i=sigma=-sigma0
-    sigma_array = []
-    tau_array = []
-    i = -sigma0
-    # Нахождение сигма и тау по диапазону зависимости K_array и L_array c шагом 0.01.
-    while i < Rc*4:
-        k = (i+sigma0)/a
-        l = 0.73*((k**2)/(k**2+1))**(3/8)
-        sigma_array.append(k*a-sigma0)
-        tau_array.append(l * a)
-        i += 0.001
+    q1_q2_array, q2_array, k1_q1_array = methodical_data()
 
+
+    def calculation_of_parameters(q1_q2_array, q2_array, k1_q1_array):
+        # Расчёт для заданных радиусов кругов
+        sigma_c = Rc*2
+        sigma_p = Rp*2
+        q1_q2 = sigma_c/sigma_p
+        q2 = np.interp(q1_q2, q1_q2_array, q2_array)
+        k1_q1 = np.interp(q1_q2, q1_q2_array, k1_q1_array)
+        a = sigma_c / (2 * q2)
+        sigma0 = a*k1_q1
+
+        # Значения для цикла. Подбор i как точка пересечения оси tau с нулём найдена по формулам ГОСТ 21153.8-88
+        # K=(sigma +sigma0)/a --> K=0 --> i=sigma=-sigma0
+        k = []
+        i = -sigma0
+
+        # Нахождение k с шагом 0.01. Верхний предел 4 Rc взят как пример
+        while i < Rc*4:
+            k.append((i+sigma0)/a)
+            i += 0.01
+
+        k_array = np.asarray(k)
+        l = 0.73*((k_array**2)/(k_array**2+1))**(3/8)
+        tau_array = l * a
+        sigma_array = (k_array * a) - sigma0
+        return sigma_array, tau_array
+
+    sigma_array, tau_array = calculation_of_parameters(q1_q2_array, q2_array, k1_q1_array)
+
+    #Нахождение искомого tau
     tau_3 = np.round(np.interp(sigma_3, sigma_array, tau_array), 4)
 
     return sigma_array, tau_array, tau_3
