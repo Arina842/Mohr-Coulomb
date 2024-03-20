@@ -82,7 +82,8 @@ def data_processing(Rc, Rp, sigma_3):
         len_k = np.arange(-sigma0, Rc*4, 0.01)
         k_array = (len_k+sigma0)/a
         l_array = 0.73*((k_array**2)/(k_array**2+1))**(3/8)
-        
+
+        #Нахождение tau и sigma огибающей
         tau_array = l_array * a
         sigma_array = (k_array * a) - sigma0
         
