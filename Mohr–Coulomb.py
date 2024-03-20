@@ -77,13 +77,13 @@ def data_processing(Rc, Rp, sigma_3):
         a = sigma_c / (2 * q2)
         sigma0 = a*k1_q1
 
-        # Нахождение k_array с шагом 0.01. Верхний предел 4 Rc взят как пример
+        # Нахождение k_array с шагом 0.01 и соответствующее значение l_array. Верхний предел 4 Rc взят как пример
         # K=(sigma +sigma0)/a --> K=0 --> нижний предел len_k= sigma =-sigma0
         len_k = np.arange(-sigma0, Rc*4, 0.01)
         k_array = (len_k+sigma0)/a
-        l = 0.73*((k_array**2)/(k_array**2+1))**(3/8)
+        l_array = 0.73*((k_array**2)/(k_array**2+1))**(3/8)
         
-        tau_array = l * a
+        tau_array = l_array * a
         sigma_array = (k_array * a) - sigma0
         
         return sigma_array, tau_array
