@@ -82,7 +82,7 @@ def data_processing(Rc, Rp, sigma_3):
     def calculate_tau(sigma):
         '''
         Функция для нахождения tau  огибающей
-        :param sigma: Задаётся для нахождения tau
+        :param sigma: Заданная sigma для нахождения tau
         :return: tau  огибающей
         '''
         # Нахождение tau по sigma для огибающей
