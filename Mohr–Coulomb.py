@@ -99,8 +99,6 @@ def data_processing(Rc, Rp, sigma_3):
     return sigma_array, tau_array, tau
 
 
-
-
 if __name__ == '__main__':
     sigma_array, tau_array, tau = data_processing(Rc, Rp, sigma_3)
     print('sigma =', sigma_3, 'tau =', tau)
