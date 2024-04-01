@@ -3,16 +3,16 @@ import matplotlib.pyplot as plt
 
 
 # Пример заданных значений
-sigma_3 = 110
-Rc = 400
-Rp = 50
+sigma_3 = -110
+Rc = 500
+Rp = 90
 sigma_3_c = 0
 sigma_3_p = 0
 
 
-def data_processing(Rc, Rp):
+def data_processing(Rc, Rp, sigma):
     """
-    Фунция для нахождения координат огибающей, тау по заданной сигме и координат огибающей
+    Фунция для нахождения тау по заданной сигме 
     :param Rc: Радиус круга сжатия
     :param Rp: Радиус круга растяжения
     :return: sigma_array, tau_array, tau
@@ -58,7 +58,7 @@ def data_processing(Rc, Rp):
 
     def calculate_parameters(q1_q2_array, q2_array, k1_q1_array):
         """
-        Фунция для нахождения sigma0, a
+        Фунция для нахождения параметров огибающей sigma0, a
         :param q1_q2_array: массив по ГОСТ 21153.8-88
         :param q2_array: массив по ГОСТ 21153.8-88
         :param k1_q1_array: массив по ГОСТ 21153.8-88
@@ -74,28 +74,31 @@ def data_processing(Rc, Rp):
         a = sigma_c / (2 * q2)
         sigma0 = a * k1_q1
         return sigma0, a
-
     sigma0, a = calculate_parameters(q1_q2_array, q2_array, k1_q1_array)
-    return sigma0, a
 
-
-def calculate_tau(sigma, sigma0, a):
-    """
-    :param sigma: Задаётся для нахождения tau
-    :param sigma0: Найденное значение параметра переноса координат
-    :param a: Найденное значение формы огибающей
-    :return: tau
-    """
-    # Нахождение tau по sigma для огибающей
-    tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
-    return tau
+    def calculate_tau(sigma, sigma0, a):
+        """
+        :param sigma: Задаётся для нахождения tau
+        :param sigma0: Найденное значение параметра переноса координат
+        :param a: Найденное значение формы огибающей
+        :return: tau огибающей
+        """
+        if isinstance(sigma, int) or isinstance(sigma, float):
+            if sigma >= (-sigma0):
+                tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
+            else:
+                tau = 'Выход за левый предел огибающей'
+        else:
+            tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
+        return tau
+    tau = calculate_tau(sigma, sigma0, a)
+    return tau, sigma0
 
 
 if __name__ == '__main__':
-    sigma0, a = data_processing(Rc, Rp)
-    tau = calculate_tau(sigma_3, sigma0, a)
+    tau, sigma0 = data_processing(Rc, Rp, sigma_3)
     print('sigma =', sigma_3, 'tau =', tau)
-    tau_array = calculate_tau(np.arange(-sigma0, Rc*4, 0.01), sigma0, a)  # Нижний предел -sigma0, верхний любой
+    tau_array, sigma0 = data_processing(Rc, Rp, np.arange(-sigma0, Rc*4, 0.01))  # Нижний предел -sigma0, верхний любой
     plt.style.use('bmh')
     plt.ylabel('τ, МПа')
     plt.xlabel('σ, МПа')
