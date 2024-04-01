@@ -12,10 +12,11 @@ sigma_3_p = 0
 
 def data_processing(Rc, Rp, sigma):
     """
-    Фунция для нахождения тау по заданной сигме 
+    Функция для нахождения тау по заданной сигме
     :param Rc: Радиус круга сжатия
     :param Rp: Радиус круга растяжения
-    :return: sigma_array, tau_array, tau
+    :param sigma: Заданное значение sigma для нахождения tau огибающей
+    :return: tau, sigma0
     """
     def methodical_data():
         """
@@ -58,11 +59,11 @@ def data_processing(Rc, Rp, sigma):
 
     def calculate_parameters(q1_q2_array, q2_array, k1_q1_array):
         """
-        Фунция для нахождения параметров огибающей sigma0, a
+        Функция для нахождения параметров огибающей sigma0, а
         :param q1_q2_array: массив по ГОСТ 21153.8-88
         :param q2_array: массив по ГОСТ 21153.8-88
         :param k1_q1_array: массив по ГОСТ 21153.8-88
-        :return: sigma0, a
+        :return: sigma0, а
         """
 
         # Расчёт параметров для заданных радиусов кругов
@@ -74,6 +75,7 @@ def data_processing(Rc, Rp, sigma):
         a = sigma_c / (2 * q2)
         sigma0 = a * k1_q1
         return sigma0, a
+    
     sigma0, a = calculate_parameters(q1_q2_array, q2_array, k1_q1_array)
 
     def calculate_tau(sigma, sigma0, a):
@@ -83,14 +85,17 @@ def data_processing(Rc, Rp, sigma):
         :param a: Найденное значение формы огибающей
         :return: tau огибающей
         """
+        # Проверка значения sigma для одного значения int или float. Если < -sigma0, то определение tau не имеет смысла
         if isinstance(sigma, int) or isinstance(sigma, float):
             if sigma >= (-sigma0):
                 tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
             else:
                 tau = 'Выход за левый предел огибающей'
-        else:
+        else: 
+            # Если numpy массив, то проверка не требуется
             tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
         return tau
+    
     tau = calculate_tau(sigma, sigma0, a)
     return tau, sigma0
 
@@ -110,3 +115,4 @@ if __name__ == '__main__':
     plt.ylim(-Rc * 2, Rc * 2)
     plt.plot(np.arange(-sigma0, Rc*4, 0.01), tau_array, color='#8955AC')  # Нижний предел -sigma0, верхний любой
     plt.show()
+    
