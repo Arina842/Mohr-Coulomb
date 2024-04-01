@@ -11,19 +11,17 @@ sigma_3_p = 0
 
 
 def data_processing(Rc, Rp):
-    '''
+    """
     Фунция для нахождения координат огибающей, тау по заданной сигме и координат огибающей
     :param Rc: Радиус круга сжатия
     :param Rp: Радиус круга растяжения
     :return: sigma_array, tau_array, tau
-    '''
-
-
+    """
     def methodical_data():
-        '''
+        """
         функция для создания массивов q1_q2_array,q2_array, k1_q1_array из ГОСТ 21153.8-88
         :return: q1_q2_array,q2_array, k1_q1_array
-        '''
+        """
         q1_q2_array = np.array([
             1.3, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.4, 4.8, 5.2, 5.6, 6.0, 6.4,
             6.8, 7.0, 7.2, 7.4, 7.6, 7.8, 8.0, 8.2, 8.4, 8.6, 8.8, 9.0, 9.2,
@@ -58,15 +56,14 @@ def data_processing(Rc, Rp):
 
     q1_q2_array, q2_array, k1_q1_array = methodical_data()
 
-
     def calculate_parameters(q1_q2_array, q2_array, k1_q1_array):
-        '''
+        """
         Фунция для нахождения sigma0, a
         :param q1_q2_array: массив по ГОСТ 21153.8-88
         :param q2_array: массив по ГОСТ 21153.8-88
         :param k1_q1_array: массив по ГОСТ 21153.8-88
         :return: sigma0, a
-        '''
+        """
 
         # Расчёт параметров для заданных радиусов кругов
         sigma_c = Rc * 2
@@ -83,11 +80,12 @@ def data_processing(Rc, Rp):
 
 
 def calculate_tau(sigma, sigma0, a):
-    '''
-    Функция для нахождения tau  огибающей
+    """
     :param sigma: Задаётся для нахождения tau
+    :param sigma0: Найденное значение параметра переноса координат
+    :param a: Найденное значение формы огибающей
     :return: tau  огибающей
-    '''
+    """
     # Нахождение tau по sigma для огибающей
     tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
     return tau
