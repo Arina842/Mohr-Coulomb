@@ -9,6 +9,7 @@ Rp = 50
 sigma_3_c = 0
 sigma_3_p = 0
 
+
 def data_processing(Rc, Rp):
     '''
     Фунция для нахождения координат огибающей, тау по заданной сигме и координат огибающей
@@ -96,7 +97,7 @@ if __name__ == '__main__':
     sigma0, a = data_processing(Rc, Rp)
     tau = calculate_tau(sigma_3, sigma0, a)
     print('sigma =', sigma_3, 'tau =', tau)
-    tau_array = calculate_tau(np.arange(-sigma0, Rc*4, 0.01), sigma0, a)
+    tau_array = calculate_tau(np.arange(-sigma0, Rc*4, 0.01), sigma0, a)  # Нижний предел -sigma0, верхний любой
     plt.style.use('bmh')
     plt.ylabel('τ, МПа')
     plt.xlabel('σ, МПа')
