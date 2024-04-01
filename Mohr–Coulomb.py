@@ -84,7 +84,7 @@ def calculate_tau(sigma, sigma0, a):
     :param sigma: Задаётся для нахождения tau
     :param sigma0: Найденное значение параметра переноса координат
     :param a: Найденное значение формы огибающей
-    :return: tau  огибающей
+    :return: tau
     """
     # Нахождение tau по sigma для огибающей
     tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
