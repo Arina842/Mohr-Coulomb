@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 
 
 # Пример заданных значений
-sigma_3 = 70
+sigma_3 = 110
 Rc = 400
 Rp = 50
 sigma_3_c = 0
 sigma_3_p = 0
 
-def data_processing(Rc, Rp, sigma_3):
+def data_processing(Rc, Rp):
     '''
     Фунция для нахождения координат огибающей, тау по заданной сигме и координат огибающей
     :param Rc: Радиус круга сжатия
@@ -78,30 +78,25 @@ def data_processing(Rc, Rp, sigma_3):
         return sigma0, a
 
     sigma0, a = calculate_parameters(q1_q2_array, q2_array, k1_q1_array)
+    return sigma0, a
 
-    def calculate_tau(sigma):
-        '''
-        Функция для нахождения tau  огибающей
-        :param sigma: Заданная sigma для нахождения tau
-        :return: tau  огибающей
-        '''
-        # Нахождение tau по sigma для огибающей
-        tau= 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
-        return tau
 
-    tau = calculate_tau(sigma_3)
-
-    # Нахождение tau_array с шагом 0.01 и соответствующее значение sigma_array. Верхний предел 4 Rc взят как пример
-    # K=(sigma +sigma0)/a --> K=0 --> нижний предел len_k= sigma =-sigma0
-    tau_array = calculate_tau(np.arange(-sigma0, Rc*4, 0.01))
-    sigma_array = np.arange(-sigma0, Rc*4, 0.01)
-
-    return sigma_array, tau_array, tau
+def calculate_tau(sigma, sigma0, a):
+    '''
+    Функция для нахождения tau  огибающей
+    :param sigma: Задаётся для нахождения tau
+    :return: tau  огибающей
+    '''
+    # Нахождение tau по sigma для огибающей
+    tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
+    return tau
 
 
 if __name__ == '__main__':
-    sigma_array, tau_array, tau = data_processing(Rc, Rp, sigma_3)
+    sigma0, a = data_processing(Rc, Rp)
+    tau = calculate_tau(sigma_3, sigma0, a)
     print('sigma =', sigma_3, 'tau =', tau)
+    tau_array = calculate_tau(np.arange(-sigma0, Rc*4, 0.01), sigma0, a)
     plt.style.use('bmh')
     plt.ylabel('τ, МПа')
     plt.xlabel('σ, МПа')
@@ -111,5 +106,5 @@ if __name__ == '__main__':
     plt.gca().add_patch(circle)
     plt.xlim(-Rc, Rc * 3)
     plt.ylim(-Rc * 2, Rc * 2)
-    plt.plot(sigma_array, tau_array, color='#8955AC')
+    plt.plot(np.arange(-sigma0, Rc*4, 0.01), tau_array, color='#8955AC')  # Нижний предел -sigma0, верхний любой
     plt.show()
