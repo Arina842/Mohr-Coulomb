@@ -98,12 +98,37 @@ def data_processing(Rc, Rp, sigma):
     
     tau = calculate_tau(sigma, sigma0, a)
     return tau, sigma0
+    
+def finding(Rc, Rp, sigma):
+    """
+    Функция для нахождения b и k для касательной к точке y=kx+b по двум близлежащим точкам
+    :param Rc: Радиус круга сжатия
+    :param Rp: Радиус круга растяжения
+    :param sigma: Заданное значение sigma для нахождения b и k для касательной
+    :return: b, k
+    """
+    # Вызываем функцию нахождения tau для двух близлежащих точек
+    sigma_find = [sigma, sigma+0.001]
+    tau, sigma0 = data_processing(Rc, Rp, sigma_find)
+    # Находим функцию касательной, проходящей через эти две точки
+    # y=(x-tau)*0.001/(tau2-tau)+sigma получившееся уравнение
+    b = -tau[0]*0.001/(tau[1] - tau[0])+sigma_find[0]
+    k = 0.001/(tau[1] - tau[0])
+
+    return b, k
 
 
 if __name__ == '__main__':
     tau, sigma0 = data_processing(Rc, Rp, sigma_3)
     print('sigma =', sigma_3, 'tau =', tau)
     tau_array, sigma0 = data_processing(Rc, Rp, np.arange(-sigma0, Rc*4, 0.01))  # Нижний предел -sigma0, верхний любой
+    b,k=finding(Rc, Rp, sigma_3)
+    # # Если нужно построить касательную
+    # y=[]
+    # for i in np.arange(-sigma0, Rc * 4, 0.01):
+    #     y.append(k*i+b)
+    # # Начертить касательную
+    # plt.plot(y, np.arange(-sigma0, Rc * 4, 0.01), color='#007400')
     plt.style.use('bmh')
     plt.ylabel('τ, МПа')
     plt.xlabel('σ, МПа')
@@ -115,4 +140,6 @@ if __name__ == '__main__':
     plt.ylim(-Rc * 2, Rc * 2)
     plt.plot(np.arange(-sigma0, Rc*4, 0.01), tau_array, color='#8955AC')  # Нижний предел -sigma0, верхний любой
     plt.show()
+   
+
     
