@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # Пример заданных значений
-sigma_3 = -110
+sigma_3 = 0
 Rc = 500
 Rp = 90
 sigma_3_c = 0
@@ -18,6 +17,7 @@ def data_processing(Rc, Rp, sigma):
     :param sigma: Заданное значение sigma для нахождения tau огибающей
     :return: tau, sigma0
     """
+
     def methodical_data():
         """
         функция для создания массивов q1_q2_array,q2_array, k1_q1_array из ГОСТ 21153.8-88
@@ -75,7 +75,7 @@ def data_processing(Rc, Rp, sigma):
         a = sigma_c / (2 * q2)
         sigma0 = a * k1_q1
         return sigma0, a
-    
+
     sigma0, a = calculate_parameters(q1_q2_array, q2_array, k1_q1_array)
 
     def calculate_tau(sigma, sigma0, a):
@@ -91,14 +91,15 @@ def data_processing(Rc, Rp, sigma):
                 tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
             else:
                 tau = 'Выход за левый предел огибающей'
-        else: 
+        else:
             # Если numpy массив, то проверка не требуется
             tau = 0.73 * ((((sigma + sigma0) / a) ** 2) / (((sigma + sigma0) / a) ** 2 + 1)) ** (3 / 8) * a
         return tau
-    
+
     tau = calculate_tau(sigma, sigma0, a)
     return tau, sigma0
-    
+
+
 def finding(Rc, Rp, sigma):
     """
     Функция для нахождения b и k для касательной к точке y=kx+b по двум близлежащим точкам
@@ -108,12 +109,12 @@ def finding(Rc, Rp, sigma):
     :return: b, k
     """
     # Вызываем функцию нахождения tau для двух близлежащих точек
-    sigma_find = [sigma, sigma+0.001]
+    delta = 0.1
+    sigma_find = [sigma, sigma+delta]
     tau, sigma0 = data_processing(Rc, Rp, sigma_find)
     # Находим функцию касательной, проходящей через эти две точки
-    # y=(x-tau)*0.001/(tau2-tau)+sigma получившееся уравнение
-    b = -tau[0]*0.001/(tau[1] - tau[0])+sigma_find[0]
-    k = 0.001/(tau[1] - tau[0])
+    k = (tau[0] - tau[1]) / (sigma_find[0] - sigma_find[1])
+    b = tau[0] - k * sigma_find[0]
 
     return b, k
 
@@ -121,14 +122,14 @@ def finding(Rc, Rp, sigma):
 if __name__ == '__main__':
     tau, sigma0 = data_processing(Rc, Rp, sigma_3)
     print('sigma =', sigma_3, 'tau =', tau)
-    tau_array, sigma0 = data_processing(Rc, Rp, np.arange(-sigma0, Rc*4, 0.01))  # Нижний предел -sigma0, верхний любой
-    b,k=finding(Rc, Rp, sigma_3)
+    tau_array, sigma0 = data_processing(Rc, Rp,
+                                        np.arange(-sigma0, Rc * 4, 0.01))  # Нижний предел -sigma0, верхний любой
+    b, k = finding(Rc, Rp, sigma_3)
     # # Если нужно построить касательную
-    # y=[]
-    # for i in np.arange(-sigma0, Rc * 4, 0.01):
-    #     y.append(k*i+b)
-    # # Начертить касательную
-    # plt.plot(y, np.arange(-sigma0, Rc * 4, 0.01), color='#007400')
+    x = np.arange(-sigma0, Rc * 4, 0.01)
+    y = k*x + b
+    # Начертить касательную
+    plt.plot(x, y, color='#007400')
     plt.style.use('bmh')
     plt.ylabel('τ, МПа')
     plt.xlabel('σ, МПа')
@@ -138,8 +139,5 @@ if __name__ == '__main__':
     plt.gca().add_patch(circle)
     plt.xlim(-Rc, Rc * 3)
     plt.ylim(-Rc * 2, Rc * 2)
-    plt.plot(np.arange(-sigma0, Rc*4, 0.01), tau_array, color='#8955AC')  # Нижний предел -sigma0, верхний любой
+    plt.plot(np.arange(-sigma0, Rc * 4, 0.01), tau_array, color='#8955AC')  # Нижний предел -sigma0, верхний любой
     plt.show()
-   
-
-    
